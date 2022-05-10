@@ -5,6 +5,12 @@ The following guidelines contain the way how to create the database, compile the
 Before starting the application, create a database instance named "FLIGHT_MANAGEMENT" in MySQL and load the sample data into the FLIGHT_MANAGEMENT space in MySQL.
 (Using FlightManagementInit.sql)
 
+## E-R Diagram
+<img src = "./E-Rdiagram.png" width="600"/>
+
+## Relational Model
+<img src = "./RelationalModel.png" width="600"/>
+
 ## Guidelines
 
 * Open your command line interface.
