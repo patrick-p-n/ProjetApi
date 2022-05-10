@@ -6,10 +6,10 @@ Before starting the application, create a database instance named "FLIGHT_MANAGE
 (Using FlightManagementInit.sql)
 
 ## E-R Diagram
-<img src = "./E-Rdiagram.png" width="600"/>
+<img src = "./E-Rdiagram.png" width="400"/>
 
 ## Relational Model
-<img src = "./RelationalModel.png" width="600"/>
+<img src = "./RelationalModel.png" width="400"/>
 
 ## Guidelines
 
