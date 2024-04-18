@@ -17,7 +17,7 @@ import org.w3c.dom.*;
 public class FlightManage extends JFrame {
 	
     // JFrame
-    static JFrame f =  new JFrame("FLIGHT MANAGE SYSTEM");
+    static JFrame f =  new JFrame("Galactics Airlines");
     
     
     static JPanel MainPage = new JPanel();
