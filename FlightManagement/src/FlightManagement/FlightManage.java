@@ -22,8 +22,10 @@ public class FlightManage extends JFrame {
     
     static JPanel MainPage = new JPanel();
     static JPanel SearchPage = new JPanel();
+	static JPanel AddClientPage = new JPanel();
+	static JButton addClientButtonConfirmation = new JButton("Confirm");
 
-    
+
     static JPanel SearchByDatePage = new JPanel();
     static JPanel SearchByDatePrintPage = new JPanel();
     static JPanel SearchByPilotPage = new JPanel();
@@ -41,9 +43,11 @@ public class FlightManage extends JFrame {
     static JPanel ScheduleGatePage = new JPanel();
     static JPanel ScheduleInsertPage = new JPanel();
     static JPanel ScheduleSuccessPage = new JPanel();
-    
-    
-    static JButton flightSearchButton = new JButton("Flight Search");
+
+	//add client
+	static JButton addClientButton = new JButton("Add Client");
+
+	static JButton flightSearchButton = new JButton("Flight Search");
     static JButton searchByDateButton = new JButton("Flight Search By Date");
     static JButton searchByDateConfirmButton = new JButton("Confirm");
     static JButton searchByPilotButton = new JButton("Flight Search By Pilot");
@@ -53,74 +57,87 @@ public class FlightManage extends JFrame {
     static JButton searchByAirlineButton = new JButton("Flight Search By Airline");
     static JButton searchByAirlineConfirmButton = new JButton("Confirm");
     static JButton backToMainPageButton = new JButton("Back to Main Page");
-    
+
     static JButton backToSearchPageButton1 = new JButton("Back to Search Page");
     static JButton backToSearchPageButton2 = new JButton("Back to Search Page");
     static JButton backToSearchPageButton3 = new JButton("Back to Search Page");
     static JButton backToSearchPageButton4 = new JButton("Back to Search Page");
-    
+
     static JButton flightScheduleButton = new JButton("Flight Schedule");
     static JButton scheduleInputConfirmButton = new JButton("Confirm");
     static JButton airlineSelectButton = new JButton("Select");
     static JButton airplaneSelectButton = new JButton("Select");
     static JButton pilotSelectButton = new JButton("Select");
     static JButton gateSelectButton = new JButton("Select");
-    
+
     static JButton insertButton= new JButton("Insert");
     static JButton cancelButton = new JButton("Cancel");
-    
+
     static JButton backToMainPageButton2 = new JButton("Back to Main Page");
-    
+
     static JLabel airportList = new JLabel();
     static JLabel airportList2 = new JLabel();
     static JLabel pilotList = new JLabel();
     static JLabel airlineList = new JLabel();
-    
+
+	static JLabel clientsList = new JLabel();
+
     static JLabel textLabelSBD = new JLabel();
     static JLabel textLabelSBP = new JLabel();
     static JLabel textLabelSBAP = new JLabel();
     static JLabel textLabelSBAL = new JLabel();
-    
+
     static JLabel textLabelAVAL = new JLabel();
     static JLabel textLabelAVAP = new JLabel();
     static JLabel textLabelAVP = new JLabel();
     static JLabel textLabelAVG = new JLabel();
-    
+
     static JLabel textLabelflight = new JLabel();
     static JLabel textLabelsuccess = new JLabel();
-    
+
+	static JLabel textLabelClients = new JLabel();
     // label to display text
     static JTextField SBDairportCode, SBDdepartureDate;
     static JTextField SBPpilotSSN;
     static JTextField SBAPoAirportCode, SBAPdAirportCode;
     static JTextField SBALairlineCode;
 
-  
-    static JTextField InputOAirport, InputDAirport, InputDDate, InputDTime, InputADate, InputATime;
+	static JTextField clientIdField, firstNameField, lastNameField, addressField, emailField, telField, birthdayField, passportField;
+	static JTextField InputOAirport, InputDAirport, InputDDate, InputDTime, InputADate, InputATime;
     static JTextField AVALairlineCode;
     static JTextField AVAPairplaneId;
     static JTextField AVPpilotSSN;
     static JTextField AVGgate;
-    
+
 	static Connection conn = null;
 	static PreparedStatement stmt = null;
 	static ResultSet rs = null;
-	
+
 	static String driver;
 	static String url;
 	static String user;
 	static String pwd;
-	
-	
+
+
 	public FlightManage() {
-		
+
 		f.add(MainPage);
 		f.setVisible(true);
 		f.setSize(1280, 400);
 		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		
+
 		InitPanels();
-		
+		//add client
+		addClientButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				f.getContentPane().removeAll(); // Remove all components from the content pane
+				f.getContentPane().add(AddClientPage); // Add the Add Client page to the content pane
+				f.revalidate(); // Revalidate the content pane to reflect the changes
+				f.repaint(); // Repaint the frame to update the changes
+			}
+		});
+
 		// 1. Flight Search
 		flightSearchButton.addMouseListener(new MouseAdapter() {
 			@Override
@@ -157,6 +174,9 @@ public class FlightManage extends JFrame {
 		
 		// 2. Flight Schedule
 		FlightScheduleButtonEvent();
+
+		//add client
+		addClientButtonEvent();
 	}
 	public static void FlightSearchByDateButtonEvent() {
 		
@@ -447,14 +467,75 @@ public class FlightManage extends JFrame {
 		});
 		
 	}
-	
-	
+	public static void addClientButtonEvent() {
+		addClientButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				StringBuilder result = AvailableClients();
+				textLabelClients.setText("<html>Available Clients<br>" + result + "</html>");
+				f.getContentPane().removeAll();
+				f.getContentPane().add(AddClientPage);
+				f.revalidate();
+				f.repaint();
+			}
+		});
+
+		addClientButtonConfirmation.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String clientId = clientIdField.getText();
+				String firstName = firstNameField.getText();
+				String lastName = lastNameField.getText();
+				String address = addressField.getText();
+				String email = emailField.getText();
+				String tel = telField.getText();
+				String birthday = birthdayField.getText();
+				String passport = passportField.getText();
+
+				insertClientData(clientId, firstName, lastName, address, email, tel, birthday, passport);
+				//textLabelsuccess.setText("<html>Your client is Successfully added!<br></html>");
+
+				// Display some message or perform any other action upon successful client insertion
+				JOptionPane.showMessageDialog(null, "Client added successfully!");
+
+				// After adding client, return to main page
+				f.getContentPane().removeAll();
+				f.getContentPane().add(MainPage);
+				f.revalidate();
+				f.repaint();
+			}
+		});
+		cancelButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				f.getContentPane().removeAll();
+				f.getContentPane().add(MainPage);
+				f.revalidate();
+				f.repaint();
+			}
+		});
+		backToMainPageButton2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				f.getContentPane().removeAll();
+				f.getContentPane().add(MainPage);
+				f.revalidate();
+				f.repaint();
+			}
+		});
+	}
+
+
+
+
 	public static void InitPanels() {
 		// Main Page Setting
 		MainPage.add(flightSearchButton);
 		MainPage.add(flightScheduleButton);
 		MainPage.setBackground(Color.lightGray);
-		
+		MainPage.add(addClientButton);
+
+
 		// Search Page Setting
 		SearchPage.add(searchByDateButton);
 		SearchPage.add(searchByPilotButton);
@@ -545,7 +626,6 @@ public class FlightManage extends JFrame {
 		
 		ScheduleMainPage.add(scheduleInputConfirmButton);
 		
-		
 		// Schedule Airline Setting
 		ScheduleAirlinePage.setBackground(Color.white);
 		ScheduleAirlinePage.add(textLabelAVAL);
@@ -585,7 +665,44 @@ public class FlightManage extends JFrame {
 		ScheduleSuccessPage.add(textLabelsuccess);
 		ScheduleSuccessPage.add(backToMainPageButton2);
 
+		// addClient Main Page Setting
+		AddClientPage.add(new JLabel("Enter the client id: "));
+		clientIdField = new JTextField(3);
+		AddClientPage.add(clientIdField);
 
+		AddClientPage.add(new JLabel("Enter the first name: "));
+		firstNameField = new JTextField(3);
+		AddClientPage.add(firstNameField);
+
+		AddClientPage.add(new JLabel("enter the last name "));
+		lastNameField = new JTextField(10);
+		AddClientPage.add(lastNameField);
+
+		AddClientPage.add(new JLabel("Enter the the address "));
+		addressField = new JTextField(8);
+		AddClientPage.add(addressField);
+
+		AddClientPage.add(new JLabel("Enter the email: "));
+		emailField = new JTextField(10);
+		AddClientPage.add(emailField);
+
+		AddClientPage.add(new JLabel("Enter the tel : "));
+		telField = new JTextField(8);
+		AddClientPage.add(telField);
+
+		AddClientPage.add(new JLabel("Enter the birthday date date(YYYY-MM-DD): "));
+		birthdayField = new JTextField(8);
+		AddClientPage.add(birthdayField);
+
+		AddClientPage.add(new JLabel("Enter the passport: "));
+		passportField = new JTextField(8);
+		AddClientPage.add(passportField);
+
+		AddClientPage.add(addClientButtonConfirmation);
+
+		// display clients
+		clientsList.setText("<html>clients Lists<br>"+ AvailableClients() + "<br></html>");
+		AddClientPage.add(clientsList);
 	}
 	public static StringBuilder PilotList() {
 		StringBuilder result = new StringBuilder();
@@ -610,7 +727,7 @@ public class FlightManage extends JFrame {
 				result.append(FullName + "&emsp&emsp " + PActivity + "&emsp&emsp " + SSN + "&emsp&emsp "
 								+ BDate + "&emsp&emsp " + LicenseNum + "&emsp&emsp&emsp&emsp&emsp " + EPTAgrade + "&emsp&emsp&emsp&emsp&emsp&emsp " + FExperience + "<br>");
 			}
-			
+
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			System.out.println("DB Driver Error!");
@@ -622,24 +739,24 @@ public class FlightManage extends JFrame {
 			try { if(stmt != null) stmt.close(); } catch (SQLException e) {e.printStackTrace(); }
 			try { if(conn != null) conn.close(); } catch (SQLException e) {e.printStackTrace(); }
 		}
-		
+
 		return result;
 	}
 	public static StringBuilder AirlineList() {
 		StringBuilder result = new StringBuilder();
 		String sql = null;
-		
+
 		  try {
 	          Class.forName(driver);
 	          conn = DriverManager.getConnection(url, user, pwd);
-	          
+
 	          sql = "SELECT CName, L.* FROM AIRLINE AS L, COUNTRY WHERE CountryCode=L.AirlineCountry;";
-	         
+
 	         stmt = conn.prepareStatement(sql);
 
 	         // 4. query execute
 	         rs = stmt.executeQuery();
-	         
+
 	         // 5. print result
 	         result.append("ICAOCode&emsp&emsp Airline Name&emsp&emsp&emsp&emsp Country<br>");
 	         result.append("----------------------------------------------------------------------------------------------------------<br>");
@@ -648,7 +765,7 @@ public class FlightManage extends JFrame {
 	             String AirlineCountry = rs.getString(2);
 	             String AirlineName = rs.getString(3);
 	             String ICAOCode = rs.getString(4);
-	             
+
 	            result.append(ICAOCode + "&emsp&emsp&emsp&emsp&emsp&emsp " + AirlineName + "&emsp&emsp&emsp&emsp&emsp " + AirlineCountry + "(" + CName + ")"+ "<br>");
 	         }
 		} catch (ClassNotFoundException e) {
@@ -662,25 +779,25 @@ public class FlightManage extends JFrame {
 			try { if(stmt != null) stmt.close(); } catch (SQLException e) {e.printStackTrace(); }
 			try { if(conn != null) conn.close(); } catch (SQLException e) {e.printStackTrace(); }
 		}
-		
+
 		return result;
 	}
-	
+
 	public static StringBuilder AirportList() {
 		StringBuilder result = new StringBuilder();
 		String sql = null;
-		
+
 		  try {
 	          Class.forName(driver);
 	          conn = DriverManager.getConnection(url, user, pwd);
-	          
+
 	          sql = "SELECT * FROM AIRPORT";
-	         
+
 	         stmt = conn.prepareStatement(sql);
 
 	         // 4. query execute
 	         rs = stmt.executeQuery();
-	         
+
 	         // 5. print result
 	         result.append("IATACode&emsp&emsp Country&emsp&emsp&emsp&emsp Airport Name<br>");
 	         result.append("----------------------------------------------------------------------------------------------------------<br>");
@@ -688,7 +805,7 @@ public class FlightManage extends JFrame {
 	        	 String IATACode = rs.getString(1);
 	             String Country = rs.getString(3);
 	             String AirportName = rs.getString(2);
-	             
+
 	            result.append(IATACode + "&emsp&emsp&emsp&emsp&emsp&emsp " + Country + "&emsp&emsp&emsp&emsp&emsp " + AirportName + "<br>");
 	         }
 		} catch (ClassNotFoundException e) {
@@ -702,9 +819,9 @@ public class FlightManage extends JFrame {
 			try { if(stmt != null) stmt.close(); } catch (SQLException e) {e.printStackTrace(); }
 			try { if(conn != null) conn.close(); } catch (SQLException e) {e.printStackTrace(); }
 		}
-		
+
 		return result;
-		
+
 	}
 	public static StringBuilder SearchByAirline(String inputAirlineCode) {
 		StringBuilder result = new StringBuilder();
@@ -722,7 +839,7 @@ public class FlightManage extends JFrame {
 						+ rs.getString(4) + "&emsp " + rs.getString(5) + "&emsp " + rs.getString(6) + "&emsp " + rs.getString(7) + "&emsp "
 						+ rs.getString(8) + "&emsp&emsp&emsp&emsp&emsp " + rs.getString(9) + "&emsp&emsp&emsp&emsp " + rs.getString(10) +"<br>");
 			}
-			
+
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			System.out.println("DB Driver Error!");
@@ -852,7 +969,68 @@ public class FlightManage extends JFrame {
 		
 		return result;
 	}
-	
+	//method to display clients
+	public static StringBuilder AvailableClients() {
+		StringBuilder result = new StringBuilder();
+		String sql = null;
+
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, user, pwd);
+
+			sql = "SELECT * FROM Client"; // Assuming your table name is Clients
+			stmt = conn.prepareStatement(sql);
+
+			// Execute the query
+			rs = stmt.executeQuery();
+
+			// Append header
+			result.append("Client ID&emsp First Name&emsp Last Name&emsp Address&emsp Email&emsp Tel&emsp Birthday&emsp Passport<br>");
+			result.append("----------------------------------------------------------------------------------------------------------<br>");
+
+			// Process the result set
+			while (rs.next()) {
+				int clientId = rs.getInt("Id");
+				String firstName = rs.getString("firstname");
+				String lastName = rs.getString("lastname");
+				String address = rs.getString("address");
+				String email = rs.getString("email");
+				String tel = rs.getString("tel");
+				String birthday = rs.getString("birthday");
+				String passport = rs.getString("passport");
+
+				// Append client information to the result StringBuilder
+				result.append(clientId + "&emsp&emsp&emsp&emsp " + firstName + "&emsp&emsp&emsp&emsp " + lastName + "&emsp&emsp&emsp&emsp " + address + "&emsp&emsp&emsp&emsp "
+						+ email + "&emsp&emsp&emsp&emsp " + tel + "&emsp&emsp&emsp&emsp " + birthday + "&emsp&emsp&emsp&emsp " + passport + "<br>");
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			System.out.println("DB Driver Error!");
+		} catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("DB Connection Error!");
+		} finally {
+			// Close resources in the finally block
+			try {
+				if (rs != null) rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (stmt != null) stmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (conn != null) conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return result;
+	}
+
 	public static StringBuilder AvailableAirline(String inputOAirport, String inputDAirport) {
 		StringBuilder result = new StringBuilder();
 		String sql = null;
@@ -1297,8 +1475,55 @@ public class FlightManage extends JFrame {
 			    }
 		} 
 		  }
+	public static void insertClientData(String id, String firstName, String lastName, String address, String email, String tel, String birthday, String passport) {
+		String sql = null;
 
-	
+		try {
+			// 1. Driver loading
+			Class.forName(driver);
+
+			// 2. Connection
+			conn = DriverManager.getConnection(url, user, pwd);
+
+			// 3. Prepared Statement
+			sql = "INSERT INTO Client (Id, firstname, lastname, address, email, tel, birthday, passport) "
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, id);
+			stmt.setString(2, firstName);
+			stmt.setString(3, lastName);
+			stmt.setString(4, address);
+			stmt.setString(5, email);
+			stmt.setString(6, tel);
+			stmt.setString(7, birthday);
+			stmt.setString(8, passport);
+
+			// 4. Query execute
+			stmt.executeUpdate();
+		} catch (ClassNotFoundException e) {
+			System.out.println("Driver loading failure");
+		} catch (SQLException e) {
+			System.out.println("Error " + e);
+		} finally {
+			try {
+				if (conn != null && !conn.isClosed()) {
+					conn.close();
+				}
+				if (stmt != null && !stmt.isClosed()) {
+					stmt.close();
+				}
+				if (rs != null && !rs.isClosed()) {
+					rs.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+
+
 	public static void main(String[] args) {
 		
 		url = args[0];
